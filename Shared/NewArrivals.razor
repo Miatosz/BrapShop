@@ -1,0 +1,101 @@
+﻿@using BrapShop.Data.Services
+@using BrapShop.Data.models
+@inject ProductService _productService
+
+
+<style>
+    .container {
+        height: 150px;
+        margin-top: 5px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+            "Image Description"
+            "Image Price";
+    }
+
+    .Image {
+        grid-area: Image;
+    }
+
+    .Description {
+        grid-area: Description;
+    }
+
+    .Price {
+        grid-area: Price;
+        font-weight: bold;
+    }
+
+    a {
+        text-decoration:none;
+        color:dodgerblue;
+    }
+
+</style>
+
+<h5 style="margin-top: 220px">New Arrivals</h5>
+
+@*<div class="container">
+    <div class="Image">
+        <Image Width=Width.Is100 Source="Images/imagestock.jpg"></Image>
+    </div>
+    <div class="Description">
+        <a href="/product/79F4AEDE-3A71-469E-9E8A-2E875F74F60F">
+            04-08 Rx8 Steering Rack to Frame Bolt (9Ya0-21-24J)
+        </a>
+    </div>
+    <div class="Price">$165.00</div>
+</div>
+
+<div class="container">
+    <div class="Image">
+        <Image Width=Width.Is100 Source="Images/imagestock.jpg"></Image>
+    </div>
+    <div class="Description">
+        <a href="/product/79F4AEDE-3A71-469E-9E8A-2E875F74F60F">
+            04-08 Rx8 Steering Rack to Frame Bolt (9Ya0-21-24J)
+        </a>
+    </div>
+    <div class="Price">$5.00</div>
+</div>
+
+<div class="container">
+    <div class="Image">
+        <Image Width=Width.Is100 Source="Images/imagestock.jpg"></Image>
+    </div>
+    <div class="Description">
+        <a href="/product/79F4AEDE-3A71-469E-9E8A-2E875F74F60F">
+            04-08 Rx8 Manual Transmission Countershaft Bearing (Y611-17-306)
+        </a>
+    </div>
+    <div class="Price">$185.00</div>
+</div>*@
+
+@foreach(var item in newArrivals)
+{
+    <div class="container">
+    <div class="Image">
+        <Image Width=Width.Is100 Source="Images/imagestock.jpg"></Image>
+    </div>
+    <div class="Description">
+        <a href="/product/@item.ID">
+            @item.Name
+        </a>
+    </div>
+    <div class="Price">$@item.Price</div>
+</div>
+}
+
+@code {
+    private List<Product> newArrivals = new List<Product>();
+
+    protected override void OnInitialized()
+    {
+        newArrivals = _productService.GetLatestProducts();
+    }
+
+}

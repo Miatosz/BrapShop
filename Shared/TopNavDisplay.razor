@@ -1,0 +1,332 @@
+﻿@using BrapShop.Data.Interfaces
+@using BrapShop.Data.models
+@using BrapShop.Data.models.ViewModels
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@using Microsoft.AspNetCore.Components.Authorization  
+@inject AuthenticationStateProvider AuthenticationStateProvider 
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject NavigationManager _navigationManager
+@inject IJSRuntime JSRuntime
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.Security.Claims
+@inject ICartRepository _cartRepository
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+
+<style>
+    p {
+        position: relative
+    }
+
+    input[type=text]:focus, input[type=email]:focus {
+        border-color: #3ca9e2
+    }
+
+    input[type=text]:focus:invalid, input[type=email]:focus:invalid {
+        color: #cc1e2b;
+        border-color: #cc1e2b
+    }
+
+    input[type=text]:valid ~ .validation, input[type=email]:valid ~ .validation {
+        display: block;
+        border-color: #0c0
+    }
+
+    input[type=text]:valid ~ .validation span, input[type=email]:valid ~ .validation span {
+        background: #0c0;
+        position: absolute;
+        border-radius: 6px
+    }
+
+    input[type=text]:valid ~ .validation span:first-child, input[type=email]:valid ~ .validation span:first-child {
+        top: 30px;
+        left: 14px;
+        width: 20px;
+        height: 3px;
+        -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg)
+    }
+
+    input[type=text]:valid ~ .validation span:last-child, input[type=email]:valid ~ .validation span:last-child {
+        top: 35px;
+        left: 8px;
+        width: 11px;
+        height: 3px;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg)
+    }
+
+    .validation {
+        display: none;
+        position: absolute;
+        content: " ";
+        height: 60px;
+        width: 30px;
+        right: 15px;
+        top: 0
+    }
+
+
+</style>
+
+
+<Bar Breakpoint="Breakpoint.Desktop" style="margin-left: 8vw; margin-right: 8vw"
+     Background="Background.White"
+     ThemeContrast="ThemeContrast.Light">
+    <BarBrand style="transform: translateY(-10%)">
+        <a style="text-decoration:none; color:black" href="/">BrapShop</a>
+    </BarBrand>
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem style="transform: translateX(10%)">
+                <BarDropdown> 
+                    <BarDropdownToggle Class="nav-link dropdown-toggle-hidden">
+                        <Div >
+                            <span Style="vertical-align: top;">Info</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </Div>                        
+                    </BarDropdownToggle>
+                    <BarDropdownMenu Shadow=Shadow.Default Border=Border.Is0>
+                        <BarDropdownItem>Technical Info</BarDropdownItem>
+                        <BarDropdownItem>Vehicle Identification</BarDropdownItem>
+                        <BarDropdownItem>Rebuild Kit Chart</BarDropdownItem>
+                        <BarDropdownItem>Engine Rebuild Pricing</BarDropdownItem>
+                        <BarDropdownItem>Rx8 Engine Identification</BarDropdownItem>
+                        <BarDropdownItem>Take Off Parts</BarDropdownItem>
+                        <BarDropdownItem>Lapped Side Housing</BarDropdownItem>
+                        <BarDropdownItem>Image Gallery</BarDropdownItem>
+                        <BarDropdownItem>One Rotor Engine</BarDropdownItem>
+                        <BarDropdownItem>Social Media</BarDropdownItem>
+                        <BarDropdownItem>Returns</BarDropdownItem>
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/shipping">Shipping</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/faq">FAQ</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/news">New!</BarLink>
+            </BarItem>
+            @if (userAuthenticated)
+            {
+                <BarItem>
+                    <BarLink To="/orders">Orders</BarLink>
+                </BarItem>
+            }           
+            <BarItem>
+                <BarLink To="/contact">Contact Us</BarLink>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+
+            <BarItem>
+                <BarDropdown>
+                    <BarDropdownToggle Class="nav-link dropdown-toggle-hidden">
+                        <span style="outline: none" class="material-symbols-outlined">
+                            search
+                        </span>
+                    </BarDropdownToggle>
+                    <BarDropdownMenu  Style="width: 400px; height: 40px; position: fixed; inset: 10px 290px auto auto; margin: 0px" TextAlignment=TextAlignment.Center>
+                        <TextEdit style="transform: translateY(-20%)" Placeholder="Search..." />
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+
+            <BarItem>
+                <BarDropdown RightAligned=true>
+                    <BarDropdownToggle Class="nav-link dropdown-toggle-hidden">
+                        <span class="material-symbols-outlined">
+                            person
+                        </span>
+                    </BarDropdownToggle>
+                    @if (userAuthenticated){
+                        <BarDropdownMenu Shadow=Shadow.Default Border=Border.Is0 Margin=Margin.Is3 Style="width: 310px; height: 255px" TextAlignment=TextAlignment.Center>
+                            <Div >
+                                <text style="color: gray">@userName</text>
+                                <Divider></Divider>
+                                <form style="margin-top: 50%" method="post" action="Identity/Account/LogOut">
+                                    <button type="submit" style="color: cornflowerblue; float: left; margin-left: 10px; border: none; background-color: white">Log out</button>                                    
+                                </form>
+                            </Div>
+                        </BarDropdownMenu>
+                                        
+                    } else {
+                        <BarDropdownMenu Shadow=Shadow.Default Border=Border.Is0 Margin=Margin.Is3 Style="width: 310px; height: 255px; border-radius: 10px;" TextAlignment=TextAlignment.Center>
+                            <Div>
+                                <h2 style="font-weight: 300;">Login</h2>
+                                <form method="post" action="Identity/Account/Login">
+                                    <p>
+                                        <input style="width: 85%; border-radius: 10px; height: 40px" type="email" id="email" name="email" placeholder="Email" required><i class="validation" style="transform: translateY(-12px) translateX(-20px)"><span></span><span></span></i>
+                                    </p>
+                                    <p>
+                                        <input style="width: 85%; border-radius: 10px; height: 40px" type="password" id="password" name="password" placeholder="Password" required><i class="validation"><span></span><span></span></i>
+                                    </p>
+                                    <p>
+                                        <button style="background-color: white ;padding: 10px; height: 40px; width:85%; margin-inline: 20px; border: solid; border-radius: 10px; border-width: thin;" type="submit">Login</button>
+                                    </p>
+                                </form>
+                                <iv>
+                                    <p> Not a member?<Button style="padding: 0px; margin-left: 10px; margin-bottom: 2px" Background=Background.White TextColor=TextColor.Primary Border=Border.Is0 Color="Color.Primary" Clicked="@ShowModal">Create Acccount</Button></p>
+                                </iv>
+                            </Div>
+                        </BarDropdownMenu>
+                    }
+                </BarDropdown>
+            </BarItem>
+            
+            <BarItem>
+                <BarDropdown RightAligned=true>
+                    <BarDropdownToggle Class="nav-link dropdown-toggle-hidden">
+                        <span class="material-symbols-outlined">
+                            garage_home
+                        </span>
+                    </BarDropdownToggle>
+                    <BarDropdownMenu Shadow=Shadow.Default Border=Border.Is0 Margin=Margin.Is3 Style="width: 310px; height: 175px" TextAlignment=TextAlignment.Center>
+                        Store vehicles in your garage. Easily find parts & accessories.
+                        <BarDropdownItem Style="padding: 10px;margin-top: 15%; width:85%; margin-inline: 20px; border: solid; border-radius: 10px; border-width: thin;" TextAlignment=TextAlignment.Center>
+                            Add Vehicle
+                        </BarDropdownItem>
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+            
+            <BarItem>
+                <BarDropdown RightAligned=true>
+                    <BarDropdownToggle Class="nav-link dropdown-toggle-hidden">
+                        <span class="material-symbols-outlined">
+                        shopping_bag
+                    </span>
+                    </BarDropdownToggle>
+                    <BarDropdownMenu Shadow=Shadow.Default Border=Border.Is0 Margin=Margin.Is3 Style="width: 310px; height: 175px" TextAlignment=TextAlignment.Center>
+                        @foreach (var item in cartItemsList)
+                        {
+                            @item.Product.Name
+                            @item.Quantity
+                        }
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+
+<Modal @ref="modalRef" >
+    <ModalContent Centered Size=ModalSize.Large style="border-radius: 10px;">
+        <ModalBody>
+            <Button Clicked="@HideModal" style="float: right">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+            </Button>
+            <p><h1 style="margin: auto; width: fit-content; margin-top: 50px">New account</h1></p>
+            <EditForm Model="newUser" OnValidSubmit="@AddUserWithRole">
+                <DataAnnotationsValidator />
+
+
+                <div style="margin: auto; width: fit-content; margin-bottom: 80px; margin-top: 60px">
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <input @bind-value="newUser.Email" style="border-radius: 10px; height: 55px; width: 400px" type="email" id="email" name="email" placeholder="  Email*" required><i><span></span><span></span></i>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <input style="border-radius: 10px; height: 55px; width: 400px" type="password" id="password" name="password" placeholder="  Password*" required><i><span></span><span></span></i>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <input @bind-value="newUser.Password" style="border-radius: 10px; height: 55px; width: 400px" type="password" id="password" name="password" placeholder="  Confirm password*" required><i><span></span><span></span></i>
+                        </div>
+                    </div>
+
+                    <input style="border-radius: 10px; margin: auto; width: 100%; height: 55px;" type="submit" class="btn btn-primary" value="Create" />
+
+                </div>
+                
+                
+            </EditForm>
+        </ModalBody>
+        
+    </ModalContent>
+</Modal>
+
+
+
+@code 
+{
+    private Modal? modalRef = new Modal();
+    private List<CartItem> cartItemsList;
+
+    protected override void OnInitialized()
+    {
+        modalRef.Visibility = Visibility.Invisible;
+        var userId = AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.Claims
+            .First(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+        cartItemsList = _cartRepository.GetCartByUserID(userId).CartItems;
+    }
+    private Task ShowModal()
+    {
+        return modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+
+
+
+    public async void logout()
+    {
+        Console.WriteLine("test");
+        await _signInManager.SignOutAsync();
+    }
+
+    bool userAuthenticated;
+    string userName;
+    protected override async Task OnInitializedAsync()  
+    {  
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();  
+        var user = authState.User;  
+        if (user.Identity.IsAuthenticated)  
+        {
+            userAuthenticated = true;
+            userName = user.Identity.Name;
+        }  
+    }  
+
+    RegisterUser newUser = new RegisterUser();
+
+
+    public async void AddUserWithRole(EditContext context)
+    {
+        var userModel = context.Model as RegisterUser;
+
+        var user = new ApplicationUser { UserName = userModel?.Email, Email = userModel?.Email, EmailConfirmed = true };
+
+        var result = await _userManager.CreateAsync(user, newUser.Password);
+
+
+        if (result.Succeeded)
+        {
+            var logResult = await _signInManager.CheckPasswordSignInAsync(user, newUser.Password, true);
+            if (logResult == Microsoft.AspNetCore.Identity.SignInResult.Success)
+            {
+                Guid key = Guid.NewGuid();
+                BlazorCookieLoginMiddleware.Logins[key] = new RegisterUser { Email = newUser.Email, Password = newUser.Password };
+                _navigationManager.NavigateTo($"/login?key={key}", true);
+            }
+        }
+
+    }
+    
+} 

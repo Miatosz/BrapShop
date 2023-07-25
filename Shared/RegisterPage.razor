@@ -1,0 +1,66 @@
+﻿@page "/register"
+
+@using BrapShop.Data.models
+@using BrapShop.Data.models.ViewModels
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Security.Claims
+@inject IJSRuntime JsRuntime
+@inject UserManager<ApplicationUser> _userManager
+@inject SignInManager<ApplicationUser> _signInManager
+@inject NavigationManager _navigationManager
+
+
+<h3>Register</h3>
+
+<EditForm Model="newUser"  OnValidSubmit="@AddUserWithRole">
+    <DataAnnotationsValidator />
+
+
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <input @bind-value="newUser.Email" style="border-radius: 4px; height: 40px" type="email" id="email" name="email" placeholder="Email..." required><i class="validation"><span></span><span></span></i>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <input @bind-value="newUser.Password" style="border-radius: 4px; height: 40px" type="password" id="password" name="password" placeholder="Password... (TODO)" required><i class="validation"><span></span><span></span></i>
+        </div>
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Save" />
+</EditForm>
+
+
+
+
+@code {
+    RegisterUser newUser = new RegisterUser();
+
+
+    public async void AddUserWithRole(EditContext context)
+    {
+        var userModel = context.Model as RegisterUser;
+
+        var user = new ApplicationUser { UserName = userModel?.Email, Email = userModel?.Email, EmailConfirmed = true };
+
+        var result = await _userManager.CreateAsync(user, newUser.Password);
+
+
+        if (result.Succeeded)
+        {            
+            var logResult = await _signInManager.CheckPasswordSignInAsync(user, newUser.Password, true);
+            if (logResult == Microsoft.AspNetCore.Identity.SignInResult.Success)
+            {
+                Guid key = Guid.NewGuid();
+                BlazorCookieLoginMiddleware.Logins[key] = new RegisterUser { Email = newUser.Email, Password = newUser.Password };
+                _navigationManager.NavigateTo($"/login?key={key}", true);
+            }
+        }
+
+    }
+
+
+
+}

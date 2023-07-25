@@ -1,0 +1,116 @@
+﻿@page "/product/{id:guid}"
+@using BrapShop.Data.Services
+@using BrapShop.Data.models
+@inject ProductService _productService
+@inject CartService _cartService
+@inject AuthenticationStateProvider authStateProvider 
+
+
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject NavigationManager _navigationManager
+@inject IJSRuntime JSRuntime
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.Security.Claims
+@using System.Windows.Input
+
+<style>
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+            "Image Info"
+            "Tabs Tabs";
+    }
+</style>
+
+
+<Div class="container" Style="margin-top: 110px">
+    <Div><Image style="width: 30vw" Source=@product.Image></Image></Div>
+    <Div style="margin-left: 40px;">
+      <p style="font-weight: bold">
+            @product.Name 
+      </p>
+        <Text>
+            @product.Descriptiom
+      </Text>
+        <h3 style="font-weight: bold; margin-top: 150px;">$@product.Price</h3>
+       <Button Outline Color="Color.Primary" Clicked="@AddToCart"> 
+                                    <span class="material-symbols-outlined">
+                                        add_shopping_cart
+                                    </span>
+                                </Button>
+                                <Button Outline Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        favorite
+                                    </span>
+                                </Button>
+  </Div>
+    <Div style="margin-top: 50px; width: 150%">
+        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+            <Items>
+                <Tab Name="Description">Description</Tab>
+                <Tab Name="Specification">Specification</Tab>
+                <Tab Name="Reviews">Reviews</Tab>
+                <Tab Name="Fitment">Fitment</Tab>
+                <Tab Name="Comments">Comments</Tab>
+            </Items>
+            <Content>
+                <TabPanel Name="Description" style="margin-top: 40px;">
+                    @product.Descriptiom
+                </TabPanel>
+                <TabPanel Name="Specification">
+                    @product.Specification
+                </TabPanel>
+                <TabPanel Name="Reviews">
+                    @product.Reviews
+                </TabPanel>
+                <TabPanel Name="Fitment">
+                    @product.Fitment
+                </TabPanel>
+            </Content>
+        </Tabs>
+  </Div>
+</Div>
+
+@code {
+    [Parameter]
+    public Guid ID { get; set; }
+
+    private Product? product;
+    string selectedTab = "profile";
+    ClaimsPrincipal? user;
+
+
+    protected override async void OnInitialized()
+    {
+        product = _productService.GetProductByID(ID);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+    }
+
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+
+    Task AddToCart()
+    {
+        //var test = user.Claims.Where(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+        var test = user.Claims.First(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+        var currUser = authStateProvider.GetAuthenticationStateAsync();
+        _cartService.AddToCart(product, test);
+
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,151 @@
+﻿@page "/"
+@using BrapShop.Data.models
+@using BrapShop.Data.Services
+@inject ProductService _productService
+
+<PageTitle>Brap Online Store</PageTitle>
+
+
+<Div>
+    <Div style="padding: 20px;margin-top: 20px; max-width: 100%">
+        <Image Source="Images/banne.png" style="height:auto;  width: 100%; padding: 20px 0px;"></Image>
+
+            <Text>
+@*                <p>Please, if you can, make your orders online, we do love to talk to our customers about technical car issues, just keep in mind that every 10 minutes on the phone is 2-3 orders that didn't get shipped out.</p>
+                <p>See our Engine Rebuild Pricing Page if you are interested in having us rebuild your engine.</p>
+                <p>We stock all of the parts on this website, with the exception of a few higher priced and rarely ordered items from Exedy and Racing Beat. You can expect your parts to be shipped out the same day, according to our shipping policies, so long as it is ordered before 1pm pacific standard time.</p>
+                <p>If you order something that is out of stock due to supplier demand and back orders, and you mention that you are in a hurry for it then we will contact you about your order the same/next business day, depending on the time the order was placed.</p>
+                <p>We do our best to keep all these and more Mazda parts in stock to keep you rolling down the road. </p>*@
+                <p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+                </p>
+            </Text>
+
+            <Div Style="margin-top: 45px;">
+                <p><h3>Featured Products</h3></p>
+                <CardDeck>
+                    <Card Border=Border.Is0>
+                        <CardImage Source="/Images/imagestock.jpg" Alt="image not found"></CardImage>
+                        <CardBody>
+                            <CardTitle TextAlignment=TextAlignment.Center Size="5">
+                            <a style="text-decoration:none;color:dodgerblue;" href="/product">
+                                    79011 Rx7 & Rx8 Flywheel Ring Gear Brake (ARE923)
+                                </a>
+                            </CardTitle>
+                            <CardText TextAlignment=TextAlignment.Center Style="font-weight: bold;">
+                                $64.00
+                            </CardText>
+                            <Div Style="bottom: 0; margin-left: 25%">
+                                <Button Outline  Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        add_shopping_cart
+                                    </span>
+                                </Button>
+                                <Button Outline  Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        favorite
+                                    </span>
+                                </Button>
+                            </Div>                        
+                        </CardBody>
+                    </Card>
+                    <Card Border=Border.Is0>
+                        <CardImage Source="/Images/imagestock.jpg" Alt="image not found"></CardImage>
+                        <CardBody>
+                            <CardTitle TextAlignment=TextAlignment.Center Size="5">
+                            <a style="text-decoration:none;color:dodgerblue;" href="/product">
+                                    79011 Rx7 & Rx8 Flywheel Ring Gear Brake (ARE923)
+                                </a>
+                            </CardTitle>
+                            <CardText TextAlignment=TextAlignment.Center Style="font-weight: bold;">
+                                $64.00
+                            </CardText>
+                            <Div Style="bottom: 0; margin-left: 25%">
+                                <Button Outline Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        add_shopping_cart
+                                    </span>
+                                </Button>
+                                <Button Outline Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        favorite
+                                    </span>
+                                </Button>
+                            </Div>
+                        </CardBody>
+                    </Card>
+                    <Card Border=Border.Is0>
+                        <CardImage Source="/Images/imagestock.jpg" Alt="image not found"></CardImage>
+                        <CardBody>
+                            <CardTitle TextAlignment=TextAlignment.Center Size="5">
+                            <a style="text-decoration:none;color:dodgerblue;" href="/product">
+                                    79011 Rx7 & Rx8 Flywheel Ring Gear Brake (ARE923)
+                                </a>
+                            </CardTitle>
+                            <CardText TextAlignment=TextAlignment.Center Style="font-weight: bold;">
+                                $64.00
+                            </CardText>
+                            <Div Style="bottom: 0; margin-left: 25%">
+                                <Button Outline  Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        add_shopping_cart
+                                    </span>
+                                </Button>
+                                <Button Outline  Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        favorite
+                                    </span>
+                                </Button>
+                            </Div>
+                        </CardBody>
+                    </Card>
+                </CardDeck>
+            </Div>
+
+            <Div Style="margin-top: 45px;">
+                <p><h3>Bestsellers</h3></p>
+                <CardDeck>
+                @foreach(var item in _bestsellers)
+                {
+                    
+                    <Card Border=Border.Is0>
+                        <CardImage Source="/Images/imagestock.jpg" Alt="image not found"></CardImage>
+                        <CardBody>
+                            <CardTitle TextAlignment=TextAlignment.Center Size="5">
+                            <a style="text-decoration:none;color:dodgerblue;"href="/product">
+                                    @item.Name
+                                </a>
+                            </CardTitle>
+                            <CardText TextAlignment=TextAlignment.Center Style="font-weight: bold;">
+                                $@item.Price
+                            </CardText>
+                            <Div Style="bottom: 0; margin-left: 30%">
+                                <Button Outline Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        add_shopping_cart
+                                    </span>
+                                </Button>
+                                <Button Outline Color="Color.Primary">
+                                    <span class="material-symbols-outlined">
+                                        favorite
+                                    </span>
+                                </Button>
+                            </Div>
+                        </CardBody>
+                    </Card>                 
+                }
+            </CardDeck>
+            </Div>
+    </Div>
+</Div>
+
+
+@code{
+    private List<Product> _bestsellers = new List<Product>();
+
+    protected override void OnInitialized()
+    {
+        _bestsellers = _productService.GetBestSellers();
+    }
+}                             

@@ -1,0 +1,41 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>BrapShop</PageTitle>
+
+<div class="page">
+    <main>
+        <Layout>
+            <LayoutHeader Fixed class="px-4" style=" border: 1px;
+                                        box-shadow: 5px 1px 8px #A0A0A0;
+                                        overflow: visible;
+                                        top: 0;
+                                        width: 100vw">
+            <TopNavDisplay />
+
+            </LayoutHeader>
+            <Layout Sider >
+                <LayoutSider class="px-5" Style="margin-left: 8vw ;margin-top: 8vh; margin-bottom: 35vh; width: 25vw; min-width: 25vw; height: 217vh; background-color: white;">
+                    <Div Width=Width.Is100>
+                        <SideNavPanel />
+                        <NewArrivals />
+                    </Div>
+                    
+                    
+                </LayoutSider>
+                <Layout Style="margin-top: 8vh; margin-bottom: 35vh; height: 217vh;">
+                    <LayoutContent >
+                        <article style="margin-top: 8vh; margin-right: 8vw">
+                            @Body
+                        </article>
+                    </LayoutContent>
+                </Layout>
+            </Layout>
+            <LayoutFooter Style="background-color: black;
+                                 margin-top: 225vh;
+                                 
+                                 height: 25vh;">
+                <FooterDisplay />
+            </LayoutFooter>
+        </Layout>
+    </main>
+</div>
