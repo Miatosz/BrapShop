@@ -1,6 +1,4 @@
 
----
-
 # BrapShop
 
 # BrapShop
@@ -27,6 +25,11 @@ BrapShop allows users to browse products, add them to a shopping cart, and place
 - Add/remove items from the cart
 - Place orders
 - Admin panel for CRUD operations on products
+
+---
+
+## 🚀 CI/CD
+This project includes a GitHub Actions workflow that automatically builds the project and runs tests on each push or pull request.
 
 ---
 
